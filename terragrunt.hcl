@@ -15,18 +15,31 @@ locals {
   source_git_ref = local.common_vars.locals.source_git_ref
 }
 
+#remote_state {
+#    backend = "azurerm"
+#    generate = {
+#        path = "backend.tf"
+#        if_exists = "overwrite_terragrunt"
+#    }
+#    config = {
+#        resource_group_name  = "terragruntdemo-rg"
+#        storage_account_name = "terragruntdemostoracc"
+#        container_name       = "terragruntdemostorcon"
+#        key                  = "${path_relative_to_include()}/terraform.tfstate"
+#    }
+#}
+
+
 remote_state {
-    backend = "azurerm"
-    generate = {
-        path = "backend.tf"
-        if_exists = "overwrite_terragrunt"
-    }
-    config = {
-        resource_group_name  = "terragruntdemo-rg"
-        storage_account_name = "terragruntdemostoracc"
-        container_name       = "terragruntdemostorcon"
-        key                  = "${path_relative_to_include()}/terraform.tfstate"
-    }
+  backend = "pg"
+  generate = {
+     path      = "backend.tf"
+     if_exists = "overwrite_terragrunt"
+  }
+  config = {
+    conn_str = "postgres://julian-paul.de/dcc?sslmode=disable"
+    schema_name = "terraform_remote_state_${local.environment_vars.locals.environment}"
+  }
 }
 
 generate "provider" {
